@@ -1,13 +1,9 @@
-import re as rgx
-import os
-from fnmatch import fnmatch as filefind
+import logging
 from yaml import load as unyammify
 from yaml import dump as yammify
 # import passlib.context import CryptContext as cryptset # prefer bcrypt_sha256
-from activitypub.manager.base import app
-#from activitypub.bson import ObjectId
-from activitypub.database import *
-from activitypub.manager import FlaskManager as Manager
+from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 
 conffile = './config.yaml'
 with open(conffile, 'r') as bindata:
@@ -20,6 +16,8 @@ dbscheme = dbinfo['scheme'].split(':')
 if rgx,search("\+", dbscheme[0]):
   dbtype = dbscheme[0].split('+')[0]
 
+app = Flask(__name__)
+
 if dbscheme[0] == "sqlite" or dbtype == "sqlite":
   if len(dbscheme[1]) < 3:
     dburi = dbinfo['scheme'] + "/" + dbinfo['namepath'] + "." + dbinfo['ext']
@@ -28,8 +26,8 @@ if dbscheme[0] == "sqlite" or dbtype == "sqlite":
       if strikenum > 4:
         del dbscheme[1][strikenum]
     dburi = dbscheme[0] + ":" + dbscheme[1] + "/" + dbinfo['namepath'] + "." + dbinfo['ext']
-  apdb = SQLDatabase(dburi)
-elif dbscheme[0] == "mysql" or dbtype == "mysql":
+  app.config['SQLALCHEMY_DATABASE_URI'] = dburi
+else:
   if dbinfo['password'] != False:
     # get tuple of password string from user input in other py file that is supposed to produce config.yaml
     # use that in place of dbinfo['password']
@@ -43,16 +41,9 @@ elif dbscheme[0] == "mysql" or dbtype == "mysql":
       dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + PASSWORD[0] + "@" + dbinfo['host'] + ":" + dbinfo['port'] + "/" + dbinfo['namepath']
     else:
       dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + PASSWORD[0] + "@" + dbinfo['host'] + "/" + dbinfo['namepath']
-  apdb = SQLDatabase(dburi)
-elif dbscheme[0] == "postgresql" or dbtype == "postgresql":
-  pass
-elif dbscheme[0] == "oracle" or dbtype == "oracle":
-  pass
-elif dbscheme[0] == "mssql" or dbtype == "mssql":
-  pass
+  app.config['SQLALCHEMY_DATABASE_URI'] = dburi
 
-activityman = Manager(database=apdb)
-activityman.setup_css()
+sb = SQLAlchemy(app)
 
 @app.route('/')
 def index():
@@ -62,4 +53,4 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-  activityman.run(debug=True)
+  app.run(debug=True)
