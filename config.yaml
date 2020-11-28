@@ -1,0 +1,23 @@
+# Web
+engine:
+  version:
+    - 0.0
+  name: Yumebooru
+  type: Application
+  context: "https://www.w3.org/ns/activitystreams"
+  construction: yes
+site:
+  name: Yumebooru
+  base_url: &siteurl "http://localhost:5000" # user-generated
+  id: *siteurl
+  summary: >
+    Lorem ipsum.
+  construction: yes
+database:
+  scheme: "sqlite://"
+  namepath: test
+  ext: db
+  host: no # either boolean or string
+  port: no # either boolean or number
+  user: no # either boolean or string
+  password: no # salt+hash of original user input
