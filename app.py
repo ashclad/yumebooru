@@ -13,7 +13,7 @@ with open(conffile, 'r') as bindata:
 dbinfo = config['database']
 dbscheme = dbinfo['scheme'].split(':')
 
-if rgx,search("\+", dbscheme[0]):
+if rgx.search("\+", dbscheme[0]):
   dbtype = dbscheme[0].split('+')[0]
 
 app = Flask(__name__)
