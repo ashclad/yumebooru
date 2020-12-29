@@ -5,7 +5,7 @@ from yaml import dump as yammify
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-conffile = './config.yaml'
+conffile = 'config.yaml'
 with open(conffile, 'r') as bindata:
   config = bindata.read()
   config = unyammify(config)
@@ -28,22 +28,15 @@ if dbscheme[0] == "sqlite" or dbtype == "sqlite":
     dburi = dbscheme[0] + ":" + dbscheme[1] + "/" + dbinfo['namepath'] + "." + dbinfo['ext']
   app.config['SQLALCHEMY_DATABASE_URI'] = dburi
 else:
-  if dbinfo['password'] != False:
-    # get tuple of password string from user input in other py file that is supposed to produce config.yaml
-    # use that in place of dbinfo['password']
-    if dbinfo['port'] != False:
-      dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + dbinfo['password'] + "@" + dbinfo['host'] + ":" + dbinfo['port'] + "/" + dbinfo['namepath']
-    else:
-      dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + dbinfo['password'] + "@" + dbinfo['host'] + "/" + dbinfo['namepath']
+  # get tuple of password string from user input
+  # compare with bcrypt_sha256 encrypted password on config.yaml
+  if dbinfo['port'] != False:
+    dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + dbinfo['password'] + "@" + dbinfo['host'] + ":" + dbinfo['port'] + "/" + dbinfo['namepath']
   else:
-    PASSWORD = (str(input("Please enter the database password: ")),)
-    if dbinfo['port'] != False:
-      dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + PASSWORD[0] + "@" + dbinfo['host'] + ":" + dbinfo['port'] + "/" + dbinfo['namepath']
-    else:
-      dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + PASSWORD[0] + "@" + dbinfo['host'] + "/" + dbinfo['namepath']
+    dburi = dbinfo['scheme'] + dbinfo['user'] + ":" + dbinfo['password'] + "@" + dbinfo['host'] + "/" + dbinfo['namepath']
   app.config['SQLALCHEMY_DATABASE_URI'] = dburi
 
-sb = SQLAlchemy(app)
+db = SQLAlchemy(app)
 
 @app.route('/')
 def index():

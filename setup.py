@@ -1,4 +1,3 @@
-import logging
 from passlib.context import CryptContext as crypttype
 from yaml import load as unyammify
 from yaml import dump as yammify
@@ -23,6 +22,7 @@ APPROOT = os.path.abspath(os.curdir)
 """
 If file exists, change contents. Otherwise, begin creating new file.
 """
+
 if os.path.exists('config.yaml') and os.path.isfile('config.yaml'):
   print("Setup has already been completed at least once.")
   wantchange = pyip.inputYesNo(prompt="Would you like to make any configuration changes? ", default="yes", limit=3)
@@ -53,9 +53,9 @@ else:
       URISCHEME = "https://"
       # make arguments below user-acquired or ping-acquired
       SERVID = tls(SITEHOST,cntry="US",stt="New York",cty="New York",org="Sample Services Institute")
-      targetpath = os.path.join(os.path.abspath(os.curdir), "static/.well-known")
+      targetpath = os.path.join(APPROOT, "static/.well-known")
       if os.path.exists(targetpath) and os.path.isdir(targetpath):
-        TLSINFO = SERVID.gencert(targetpath)
+        SERVID.gencert(targetpath)
       else:
         os.makedirs(targetpath)
         SERVID.gencert(targetpath)
@@ -95,7 +95,7 @@ else:
       URISCHEME = "https://"
        # make arguments below user-acquired or ping-acquired
       SERVID = tls(SITEHOST,cntry="US",stt="New York",cty="New York",org="Sample Services Institute")
-      targetpath = os.path.join(os.path.abspath(os.curdir), "static/.well-known")
+      targetpath = os.path.join(APPROOT, "static/.well-known")
       if os.path.exists(targetpath) and os.path.isdir(targetpath):
         TLSINFO = SERVID.gencert(targetpath)
       else:
@@ -186,6 +186,7 @@ else:
       "base_url": BASEURL,
       "id": BASEURL,
       "summary": SITEDESC,
+      "theme": "default",
       "construction": False
     },
     "database": {
